@@ -1,0 +1,17 @@
+[package]
+name = "zed-thrax"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+# Its own workspace: this is a Zed extension (built to wasm by Zed), not part
+# of the compiler's dependency-free workspace.
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+zed_extension_api = "0.7.0"

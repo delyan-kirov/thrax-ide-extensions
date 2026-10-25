@@ -1,0 +1,19 @@
+id = "thrax"
+name = "Thrax"
+version = "0.1.0"
+schema_version = 1
+authors = ["Delyan Kirov"]
+description = "Thrax: diagnostics, fixes, hover, completion and formatting from `thrax lsp`"
+repository = "https://github.com/delyan-kirov/Thrax"
+
+[language_servers.thrax]
+name = "Thrax"
+languages = ["Thrax"]
+
+# Zed fetches the grammar with git at `rev` and compiles `path`/src/parser.c:
+# after regenerating the grammar (`thxdo tree-sitter`) and committing it, point
+# `rev` at that commit.
+[grammars.thrax]
+repository = "https://github.com/delyan-kirov/thrax-ide-extensions"
+rev = "COMMIT_WITH_GENERATED_GRAMMAR"
+path = "tree-sitter-thrax"

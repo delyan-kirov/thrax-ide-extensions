@@ -1,0 +1,194 @@
+{
+  "name": "thrax",
+  "displayName": "Thrax",
+  "description": "Thrax: diagnostics, fixes, hover, completion and formatting from the `thrax lsp` server",
+  "version": "0.1.0",
+  "publisher": "thrax",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delyan-kirov/Thrax"
+  },
+  "engines": {
+    "vscode": "^1.82.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "thrax",
+        "aliases": [
+          "Thrax",
+          "thrax"
+        ],
+        "extensions": [
+          ".thx"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "thrax",
+        "scopeName": "source.thrax",
+        "path": "./syntaxes/thrax.tmLanguage.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[thrax]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.semanticHighlighting.enabled": true
+      }
+    },
+    "commands": [
+      {
+        "command": "thrax.restartServer",
+        "title": "Restart Language Server",
+        "category": "Thrax"
+      }
+    ],
+    "configuration": {
+      "title": "Thrax",
+      "properties": {
+        "thrax.server.path": {
+          "type": "string",
+          "default": "thrax",
+          "description": "The `thrax` executable. The server is started as `<path> [extraArgs] lsp`."
+        },
+        "thrax.server.extraArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Flags put before `lsp`, such as `--import-dir=DIR`."
+        },
+        "thrax.lsp.check": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "type",
+            "save",
+            null
+          ],
+          "default": null,
+          "markdownDescription": "When the editor checks: as you type (`type`), or only when a file is saved (`save`). Unset: `thrax.toml`, else `type`."
+        },
+        "thrax.lsp.focus": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "all",
+            "roots",
+            "one",
+            null
+          ],
+          "default": null,
+          "markdownDescription": "How loudly errors are shown. `all`: every error at full strength. `roots`: errors that follow from an earlier one are quieter. `one`: only the most important error per file is an error. Unset: `thrax.toml`, else `roots`."
+        },
+        "thrax.lsp.debounce_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 5000,
+          "default": null,
+          "markdownDescription": "How long typing must pause before the file is checked. Unset: `thrax.toml`, else 150."
+        },
+        "thrax.lsp.grace": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "markdownDescription": "Hold back errors inside the definition being typed until typing pauses for `grace_ms`. Unset: `thrax.toml`, else true."
+        },
+        "thrax.lsp.grace_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 60000,
+          "default": null,
+          "markdownDescription": "The pause after which held-back errors are shown. Unset: `thrax.toml`, else 1500."
+        },
+        "thrax.lsp.max_diagnostics": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 10000,
+          "default": null,
+          "markdownDescription": "The most diagnostics shown per file. Unset: `thrax.toml`, else 50."
+        },
+        "thrax.format.width": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 40,
+          "maximum": 400,
+          "default": null,
+          "markdownDescription": "The line width the formatter fits code into. Unset: `thrax.toml`, else 100."
+        },
+        "thrax.format.indent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 16,
+          "default": null,
+          "markdownDescription": "Spaces per indentation level. Unset: `thrax.toml`, else 4."
+        },
+        "thrax.lints.unreachable_arm": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "allow",
+            "warn",
+            "deny",
+            null
+          ],
+          "default": null,
+          "markdownDescription": "A match arm no value can reach. Unset: `thrax.toml`, else `warn`."
+        },
+        "thrax.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Log the protocol traffic with the server to the Thrax output channel."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "package": "vsce package --allow-missing-repository"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.2.0"
+  }
+}

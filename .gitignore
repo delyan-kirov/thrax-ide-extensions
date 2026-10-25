@@ -1,0 +1,14 @@
+# Native builds of TAGS.thx and the generators (`thrax build`)
+thrax-out/
+
+# Written by `thxdo tags`
+tags
+
+# VS Code: npm install and the packaged extension
+vscode/node_modules/
+vscode/*.vsix
+
+# Zed: the cargo build and what Zed writes into a dev extension
+zed/target/
+zed/extension.wasm
+zed/grammars/
