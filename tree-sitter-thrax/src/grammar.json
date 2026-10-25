@@ -575,6 +575,35 @@
               "value": "$"
             },
             {
+              "type": "SYMBOL",
+              "name": "at_tycon"
+            },
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "sig"
+            },
+            {
+              "type": "STRING",
+              "value": "="
+            },
+            {
+              "type": "SYMBOL",
+              "name": "builtin_lit"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "$"
+            },
+            {
               "type": "STRING",
               "value": "@e"
             },
@@ -4220,19 +4249,41 @@
       ]
     },
     "extern_lit": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "@extern"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "str"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "str"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "str"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "builtin_lit"
+        }
+      ]
+    },
+    "builtin_lit": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
           "value": "@extern"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "str"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "str"
         },
         {
           "type": "SYMBOL",

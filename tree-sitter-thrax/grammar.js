@@ -26,6 +26,7 @@ module.exports = grammar({
       seq('$', '@main', ':', $.type, '=', $.expr),
       seq('$', '@build', ':', $.type, '=', $.expr),
       seq('$', $.at_iface, ':', '@struct', optional($.opt_type_params), '=', $.struct_body),
+      seq('$', $.at_tycon, ':', $.sig, '=', $.builtin_lit),
       seq('$', '@e', $.expr),
       prec.right(2, seq('$', '@e', '<|', $.expr)),
       seq('$', '@run', $.expr),
@@ -350,7 +351,11 @@ module.exports = grammar({
       prec.left(15, seq('@array', '.', '{', $.expr, optional($.opt_comma), '}')),
       prec.left(15, seq('@array', '.', '{', '.', $.lident, '=', $.expr, optional($.opt_comma), '}')),
     ),
-    extern_lit: $ => seq('@extern', $.str, $.str, $.str),
+    extern_lit: $ => choice(
+      seq('@extern', $.str, $.str, $.str),
+      $.builtin_lit,
+    ),
+    builtin_lit: $ => seq('@extern', $.str),
     handle: $ => choice(
       prec.right(seq('do', $.expr)),
       prec.right(seq('do', $.expr, 'ctl', $.lident, $.handler_arms)),

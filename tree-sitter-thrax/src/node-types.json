@@ -228,6 +228,21 @@
     }
   },
   {
+    "type": "builtin_lit",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "str",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "clause",
     "named": true,
     "fields": {},
@@ -501,6 +516,10 @@
       "required": true,
       "types": [
         {
+          "type": "builtin_lit",
+          "named": true
+        },
+        {
           "type": "str",
           "named": true
         }
@@ -657,7 +676,15 @@
           "named": true
         },
         {
+          "type": "at_tycon",
+          "named": true
+        },
+        {
           "type": "body",
+          "named": true
+        },
+        {
+          "type": "builtin_lit",
           "named": true
         },
         {
@@ -690,6 +717,10 @@
         },
         {
           "type": "opt_type_params",
+          "named": true
+        },
+        {
+          "type": "sig",
           "named": true
         },
         {
