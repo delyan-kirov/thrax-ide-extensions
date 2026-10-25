@@ -23,14 +23,14 @@ $ with OPT
 $ with STR
 $ with VEC
 
-$ spec_path : @str = "documentation/thrax.y"
+$ spec_path : @Str = "documentation/thrax.y"
 
-$ out_dir : @str = "tools/editors/tree-sitter-thrax"
+$ out_dir : @Str = "tools/editors/tree-sitter-thrax"
 
 # ---- the spelling of every terminal ----------------------------------------
 
 # A string is a literal token; `$.name` refers to a lexical rule in `lexical`.
-$ tokens : @vec { @str, @str } =
+$ tokens : @Vec { @Str, @Str } =
     [
         { "INT", "$.int" },
         { "REAL", "$.real" },
@@ -53,7 +53,7 @@ $ tokens : @vec { @str, @str } =
         { "AT_IFACE", "$.at_iface" },
         { "AT_PRIVATE", "'@private'" },
         { "AT_EXTERN", "'@extern'" },
-        { "AT_ARRAY", "'@array'" },
+        { "AT_ARRAY", "'@Array'" },
         { "AT_TRUE", "'@true'" },
         { "AT_FALSE", "'@false'" },
         { "AT_TYCON", "$.at_tycon" },
@@ -108,7 +108,7 @@ $ tokens : @vec { @str, @str } =
 
 # The lexical rules the named tokens above refer to, as the lexer reads them
 # (crates/frontend/src/lexer.rs).
-$ lexical : @str =
+$ lexical : @Str =
     "    int: $ => /0[xX][0-9a-fA-F_]+|0[bB][01_]+|[0-9][0-9_]*/,\n"
         ++ "    real: $ => /[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9]+)?|[0-9][0-9_]*[eE][+-]?[0-9]+/,\n"
         ++ "    imag: $ => /[0-9][0-9_]*(\\.[0-9][0-9_]*)\?([eE][+-]?[0-9]+)\?i/,\n"
@@ -116,7 +116,7 @@ $ lexical : @str =
         ++ "    uident: $ => /[A-Z][A-Za-z0-9_]*/,\n"
         ++ "    lident: $ => /[a-z_][A-Za-z0-9_]*/,\n"
         ++ "    hole: $ => '???',\n"
-        ++ "    at_tycon: $ => /@[a-z][a-z0-9_]*/,\n"
+        ++ "    at_tycon: $ => /@[A-Za-z][A-Za-z0-9_]*/,\n"
         ++ "    at_iface: $ => /@I[A-Z][A-Za-z]*/,\n"
         ++ "    comment: $ => token(choice(prec(1, /#-([^-]|-[^#])*-#/), /#[^\\n]*/)),\n"
 
@@ -124,24 +124,24 @@ $ lexical : @str =
 # spec), tree-sitter asks for the choice to be made explicit. These rules
 # prefer shifting: their alternatives without a precedence of their own get
 # right associativity, which tree-sitter resolves as shift.
-$ prefer_shift : @vec @str = ["handle", "ctrl_expr"]
+$ prefer_shift : @Vec @Str = ["handle", "ctrl_expr"]
 
 # Rule pairs tree-sitter must explore both ways (GLR), for an ambiguity no
 # precedence settles.
-$ conflicts : @vec { @str, @str } = []
+$ conflicts : @Vec { @Str, @Str } = []
 
 # ---- reading the spec -------------------------------------------------------
 
-$ Prec : @struct = name: @str, level: @int, assoc: @str,
+$ Prec : @struct = name: @Str, level: @Int, assoc: @Str,
 
-$ Header : @struct = terms: @vec @str, precs: @vec Prec,
+$ Header : @struct = terms: @Vec @Str, precs: @Vec Prec,
 
-$ Alt : @struct = syms: @vec @str, prec: @str,
+$ Alt : @struct = syms: @Vec @Str, prec: @Str,
 
-$ Rule : @struct = name: @str, alts: @vec Alt,
+$ Rule : @struct = name: @Str, alts: @Vec Alt,
 
 # The declarations before the first `%%` and the rules up to the second.
-$ sections : @str -> { @str, @str } = \s =
+$ sections : @Str -> { @Str, @Str } = \s =
     is STR.find s "\n%%"
     | Option.Some.{ a } =>
         let rest = STR.substr s (a + 3) (STR.len s) in
@@ -153,9 +153,9 @@ $ sections : @str -> { @str, @str } = \s =
     | _ => { "", s }
 
 # Words, and the marks `:` `|` `;`, with `/* ... */` comments dropped.
-$ tokenize : @str -> @vec @str = \s = scan s 0 []
+$ tokenize : @Str -> @Vec @Str = \s = scan s 0 []
 
-$ scan : @str -> @int -> @vec @str -> @vec @str = \s i acc =
+$ scan : @Str -> @Int -> @Vec @Str -> @Vec @Str = \s i acc =
     if i >= STR.len s => acc
     else
         let c = STR.at s i in
@@ -164,25 +164,25 @@ $ scan : @str -> @int -> @vec @str -> @vec @str = \s i acc =
         else if is_mark c => scan s (i + 1) (VEC.push acc (STR.from_byte c))
         else let j = word_end s i in scan s j (VEC.push acc (STR.substr s i j))
 
-$ is_mark : @int -> @bool = \c = c == 58 || c == 124 || c == 59
+$ is_mark : @Int -> @Bool = \c = c == 58 || c == 124 || c == 59
 
-$ opens_comment : @str -> @int -> @bool = \s i =
+$ opens_comment : @Str -> @Int -> @Bool = \s i =
     i + 1 < STR.len s && STR.at s i == 47 && STR.at s (i + 1) == 42
 
-$ comment_end : @str -> @int -> @int = \s i =
+$ comment_end : @Str -> @Int -> @Int = \s i =
     is STR.find_from s "*/" i | Option.Some.{ j } => j + 2 | _ => STR.len s
 
-$ word_end : @str -> @int -> @int = \s i =
+$ word_end : @Str -> @Int -> @Int = \s i =
     if i >= STR.len s => i
     else if STR.is_space (STR.at s i) || is_mark (STR.at s i) || opens_comment s i => i
     else word_end s (i + 1)
 
 # `%token` names terminals; each `%left`/`%right`/`%precedence` line names
 # terminals too and opens the next, tighter, precedence level.
-$ read_header : @vec @str -> Header = \toks =
+$ read_header : @Vec @Str -> Header = \toks =
     (VEC.foldl header_step { "", 0, Header.{ .terms = [], .precs = [] } } toks).2
 
-$ header_step : { @str, @int, Header } -> @str -> { @str, @int, Header } = \st tok =
+$ header_step : { @Str, @Int, Header } -> @Str -> { @Str, @Int, Header } = \st tok =
     let dir = st.0, level = st.1, h = st.2 in
     if STR.starts_with tok "%" =>
         let assoc = is tok
@@ -200,13 +200,13 @@ $ header_step : { @str, @int, Header } -> @str -> { @str, @int, Header } = \st t
 
 # `name : alt | alt ... ;`, each alternative a run of symbols and an optional
 # `%prec TOKEN`.
-$ read_rules : @vec @str -> @int -> @vec Rule -> @vec Rule = \t i acc =
+$ read_rules : @Vec @Str -> @Int -> @Vec Rule -> @Vec Rule = \t i acc =
     if i + 1 >= VEC.len t => acc
     else
         let r = read_alts t (i + 2) [] [] "" in
         read_rules t r.1 (VEC.push acc Rule.{ .name = @vec_get t i, .alts = r.0 })
 
-$ read_alts : @vec @str -> @int -> @vec Alt -> @vec @str -> @str -> { @vec Alt, @int } = \t i alts syms prec =
+$ read_alts : @Vec @Str -> @Int -> @Vec Alt -> @Vec @Str -> @Str -> { @Vec Alt, @Int } = \t i alts syms prec =
     let done = VEC.push alts Alt.{ .syms = syms, .prec = prec } in
     if i >= VEC.len t => { done, i }
     else
@@ -218,11 +218,11 @@ $ read_alts : @vec @str -> @int -> @vec Alt -> @vec @str -> @str -> { @vec Alt, 
 
 # ---- analysis ---------------------------------------------------------------
 
-$ has : @vec @str -> @str -> @bool = \v s = VEC.contains STR.eq s v
+$ has : @Vec @Str -> @Str -> @Bool = \v s = VEC.contains STR.eq s v
 
 # The rules that can match nothing: grown to a fixed point from the ones with
 # an alternative whose every symbol is already known nullable.
-$ nullable_set : @vec Rule -> @vec @str -> @vec @str = \rules known =
+$ nullable_set : @Vec Rule -> @Vec @Str -> @Vec @Str = \rules known =
     let next = VEC.foldl (
             \acc r =
                 if has acc r.name => acc
@@ -231,9 +231,9 @@ $ nullable_set : @vec Rule -> @vec @str -> @vec @str = \rules known =
         ) known rules in
     if VEC.len next == VEC.len known => known else nullable_set rules next
 
-$ Ctx : @struct = terms: @vec @str, nullable: @vec @str, precs: @vec Prec,
+$ Ctx : @struct = terms: @Vec @Str, nullable: @Vec @Str, precs: @Vec Prec,
 
-$ find_prec : Ctx -> @str -> Option Prec = \c name = VEC.find (\p = p.name == name) c.precs
+$ find_prec : Ctx -> @Str -> Option Prec = \c name = VEC.find (\p = p.name == name) c.precs
 
 # Bison's rule precedence: the `%prec` token, else the last terminal that has
 # a precedence.
@@ -245,7 +245,7 @@ $ alt_prec : Ctx -> Alt -> Option Prec = \c a =
         ) Option.None a.syms
 
 # Terminals the rules use that `tokens` does not spell.
-$ unmapped : Ctx -> @vec Rule -> @vec @str = \c rules =
+$ unmapped : Ctx -> @Vec Rule -> @Vec @Str = \c rules =
     let used = VEC.flat_map (\r = VEC.flat_map (\a = a.syms) r.alts) rules in
     VEC.foldl (
         \acc s =
@@ -256,29 +256,29 @@ $ unmapped : Ctx -> @vec Rule -> @vec @str = \c rules =
 
 # ---- writing grammar.js -----------------------------------------------------
 
-$ seq_js : @vec @str -> @str = \parts =
+$ seq_js : @Vec @Str -> @Str = \parts =
     if VEC.len parts == 1 => @vec_get parts 0 else "seq(" ++ STR.join ", " parts ++ ")"
 
-$ choice_js : @vec @str -> @str = \parts =
+$ choice_js : @Vec @Str -> @Str = \parts =
     if VEC.len parts == 1 => @vec_get parts 0
     else "choice(\n      " ++ STR.join ",\n      " parts ++ ",\n    )"
 
-$ token_js : @str -> @str = \s = unwrap_or (VEC.lookup STR.eq s tokens) s
+$ token_js : @Str -> @Str = \s = unwrap_or (VEC.lookup STR.eq s tokens) s
 
-$ sym_js : Ctx -> @str -> @str = \c s =
+$ sym_js : Ctx -> @Str -> @Str = \c s =
     if has c.terms s => token_js s
     else if has c.nullable s => "optional($." ++ s ++ ")"
     else "$." ++ s
 
 # An alternative of nullable rules only, as one choice per rule it starts at:
 # that rule required, the ones after it optional.
-$ expansions : Ctx -> @vec @str -> @int -> @vec @str = \c syms i =
+$ expansions : Ctx -> @Vec @Str -> @Int -> @Vec @Str = \c syms i =
     if i >= VEC.len syms => []
     else
         let rest = VEC.map (sym_js c) (VEC.drop (i + 1) syms) in
         VEC.append [seq_js (VEC.append ["$." ++ @vec_get syms i] rest)] (expansions c syms (i + 1))
 
-$ wrap_prec : Ctx -> @str -> Alt -> @str -> @str = \c rule a body =
+$ wrap_prec : Ctx -> @Str -> Alt -> @Str -> @Str = \c rule a body =
     is alt_prec c a
     | Option.Some.{ p } =>
         let f = is p.assoc
@@ -288,19 +288,19 @@ $ wrap_prec : Ctx -> @str -> Alt -> @str -> @str = \c rule a body =
         f ++ "(" ++ STR.from_int p.level ++ ", " ++ body ++ ")"
     | _ => if has prefer_shift rule => "prec.right(" ++ body ++ ")" else body
 
-$ alt_js : Ctx -> @str -> Alt -> Option @str = \c rule a =
+$ alt_js : Ctx -> @Str -> Alt -> Option @Str = \c rule a =
     if VEC.is_empty a.syms => Option.None
     else if VEC.all (has c.nullable) a.syms =>
         Option.Some.{ wrap_prec c rule a (choice_js (expansions c a.syms 0)) }
     else Option.Some.{ wrap_prec c rule a (seq_js (VEC.map (sym_js c) a.syms)) }
 
-$ rule_js : Ctx -> Rule -> @str = \c r =
+$ rule_js : Ctx -> Rule -> @Str = \c r =
     "    " ++ r.name ++ ": $ => " ++ choice_js (VEC.filter_map (alt_js c r.name) r.alts) ++ ",\n"
 
-$ conflicts_js : @str =
+$ conflicts_js : @Str =
     STR.concat (VEC.map (\p = "    [$." ++ p.0 ++ ", $." ++ p.1 ++ "],\n") conflicts)
 
-$ grammar_js : Ctx -> @vec Rule -> @str = \c rules =
+$ grammar_js : Ctx -> @Vec Rule -> @Str = \c rules =
     "// AUTOGENERATED by tools/editors/TREE_SITTER_GEN.thx from documentation/thrax.y.\n"
         ++ "// Do not edit: change the spec or the generator, then run `thxdo tree-sitter`.\n\n"
         ++ "module.exports = grammar(\{\n"
@@ -316,7 +316,7 @@ $ grammar_js : Ctx -> @vec Rule -> @str = \c rules =
         ++ "  },\n"
         ++ "});\n"
 
-$ @main : @vec @str -> <@io> @int = \args =
+$ @main : @Vec @Str -> <@IO> @Int = \args =
     is IO.read_file spec_path
     | Option.Some.{ src } =>
         let parts = sections src in

@@ -2108,11 +2108,11 @@
     "named": false
   },
   {
-    "type": "@alias",
+    "type": "@Array",
     "named": false
   },
   {
-    "type": "@array",
+    "type": "@alias",
     "named": false
   },
   {

@@ -348,8 +348,8 @@ module.exports = grammar({
       seq($.dot_inits, ',', 'with', $.op_expr),
     ),
     array_lit: $ => choice(
-      prec.left(15, seq('@array', '.', '{', $.expr, optional($.opt_comma), '}')),
-      prec.left(15, seq('@array', '.', '{', '.', $.lident, '=', $.expr, optional($.opt_comma), '}')),
+      prec.left(15, seq('@Array', '.', '{', $.expr, optional($.opt_comma), '}')),
+      prec.left(15, seq('@Array', '.', '{', '.', $.lident, '=', $.expr, optional($.opt_comma), '}')),
     ),
     extern_lit: $ => choice(
       seq('@extern', $.str, $.str, $.str),
@@ -462,7 +462,7 @@ module.exports = grammar({
     uident: $ => /[A-Z][A-Za-z0-9_]*/,
     lident: $ => /[a-z_][A-Za-z0-9_]*/,
     hole: $ => '???',
-    at_tycon: $ => /@[a-z][a-z0-9_]*/,
+    at_tycon: $ => /@[A-Za-z][A-Za-z0-9_]*/,
     at_iface: $ => /@I[A-Z][A-Za-z]*/,
     comment: $ => token(choice(prec(1, /#-([^-]|-[^#])*-#/), /#[^\n]*/)),
   },

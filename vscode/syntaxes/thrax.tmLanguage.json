@@ -196,7 +196,7 @@
           "name": "keyword.other.directive.thrax"
         },
         {
-          "match": "@[a-z][A-Za-z0-9_]*\\b",
+          "match": "@[A-Za-z][A-Za-z0-9_]*\\b",
           "name": "support.function.builtin.thrax"
         }
       ]

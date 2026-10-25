@@ -4160,7 +4160,7 @@
             "members": [
               {
                 "type": "STRING",
-                "value": "@array"
+                "value": "@Array"
               },
               {
                 "type": "STRING",
@@ -4201,7 +4201,7 @@
             "members": [
               {
                 "type": "STRING",
-                "value": "@array"
+                "value": "@Array"
               },
               {
                 "type": "STRING",
@@ -5348,7 +5348,7 @@
     },
     "at_tycon": {
       "type": "PATTERN",
-      "value": "@[a-z][a-z0-9_]*"
+      "value": "@[A-Za-z][A-Za-z0-9_]*"
     },
     "at_iface": {
       "type": "PATTERN",
