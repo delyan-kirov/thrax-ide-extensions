@@ -712,6 +712,10 @@
           "named": true
         },
         {
+          "type": "opt_comma",
+          "named": true
+        },
+        {
           "type": "opt_sig",
           "named": true
         },
@@ -850,9 +854,32 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "import",
+          "named": true
+        },
+        {
+          "type": "import_entry",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "import_entry",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "any_name",
+          "named": true
+        },
         {
           "type": "dotted_name",
           "named": true
@@ -980,11 +1007,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
-          "type": "pat_elems",
+          "type": "opt_comma",
+          "named": true
+        },
+        {
+          "type": "pat_elem_list",
           "named": true
         }
       ]
@@ -1257,29 +1288,6 @@
     }
   },
   {
-    "type": "pat_elems",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "opt_comma",
-          "named": true
-        },
-        {
-          "type": "pat_elem_list",
-          "named": true
-        },
-        {
-          "type": "pattern",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "pat_payload",
     "named": true,
     "fields": {},
@@ -1312,10 +1320,6 @@
         },
         {
           "type": "pattern",
-          "named": true
-        },
-        {
-          "type": "str",
           "named": true
         }
       ]

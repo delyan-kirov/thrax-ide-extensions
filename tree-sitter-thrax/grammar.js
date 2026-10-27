@@ -21,7 +21,7 @@ module.exports = grammar({
       seq('$', $.uident, ':', '@alias', optional($.opt_type_params), '=', $.type),
       seq('$', $.uident, ':', '@alias', optional($.opt_type_params), '=', $.eff_row),
       seq('$', $.uident, ':', '@effect', optional($.opt_type_params), '=', $.effect_body),
-      seq('$', 'with', $.import),
+      seq('$', 'with', $.import, optional($.opt_comma)),
       seq('$', '@private'),
       seq('$', '@main', ':', $.type, '=', $.expr),
       seq('$', '@build', ':', $.type, '=', $.expr),
@@ -65,7 +65,14 @@ module.exports = grammar({
       prec.right(2, '<|'),
       prec.right(12, '<|>'),
     ),
-    import: $ => $.dotted_name,
+    import: $ => choice(
+      $.import_entry,
+      seq($.import, ',', $.import_entry),
+    ),
+    import_entry: $ => choice(
+      $.dotted_name,
+      seq($.any_name, '=', $.dotted_name),
+    ),
     dotted_name: $ => choice(
       $.any_name,
       prec.left(15, seq($.any_name, '.', $.any_name)),
@@ -397,7 +404,7 @@ module.exports = grammar({
     pattern: $ => choice(
       $.pat_atom,
       prec.right(7, seq($.pat_atom, '::', $.pattern)),
-      prec.left(8, seq($.str, '++', $.pattern)),
+      prec.left(8, seq($.pat_atom, '++', $.pattern)),
       seq($.num_lit, '...', $.num_lit),
       seq($.num_lit, '...'),
     ),
@@ -434,12 +441,7 @@ module.exports = grammar({
     ),
     list_pattern: $ => choice(
       seq('[', ']'),
-      seq('[', $.pat_elems, ']'),
-    ),
-    pat_elems: $ => choice(
-      seq($.pat_elem_list, optional($.opt_comma)),
-      prec.left(15, seq($.pat_elem_list, ',', '.', '.', $.pattern)),
-      prec.left(15, seq('.', '.', $.pattern)),
+      seq('[', $.pat_elem_list, optional($.opt_comma), ']'),
     ),
     pat_elem_list: $ => choice(
       $.pattern,
